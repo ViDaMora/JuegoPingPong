@@ -3,24 +3,25 @@
 	self.Board = function(width,height){
 		this.width = width;
 		this.height = height;
-		this.playing = false;
 		this.game_over = false;
 		this.bars = [];
 		this.ball = null;
+		this.playing = false;
 	}
 
 	self.Board.prototype = {
         //getter para obtener las barras y la bola 
 		get elements(){
-			var elements = this.bars;
-		//	elements.push(this.ball);
+            //se pasa el arreglo como copia
+			var elements = this.bars.map(function(bar){ return bar; });
+			elements.push(this.ball);
 			return elements;
 		}
         
 	}
 })();
 
-
+//Creacion objeto Barras
 (function(){
     self.Bar = function(x,y,width,height,board){
         this.x = x;
@@ -29,7 +30,9 @@
         this.height = height;
         this.board = board;
         this.speed= 10;
+
         this.board.bars.push(this)
+
         this.kind ="rectangle"
     }
     self.Bar.prototype ={
@@ -39,12 +42,16 @@
         up : function(){
             this.y -=this.speed
         },
+
         toString: function(){
             return "x:" + this.x + " y:" + this.y
         }
     }
 
-})()
+})();
+
+
+//Creacion objeto bola
 (function(){
     self.Ball = function(x,y,radius,board){
         this.x = x;
@@ -53,28 +60,16 @@
 		this.speed_y = 0;
 		this.speed_x = 3;
 		this.board = board;
-		this.direction = -1;
-		this.speed = 3;
-        this.bounce_angle = 0;
-		this.max_bounce_angle = Math.PI / 12;
-
-
-
 		board.ball = this;
 		this.kind = "circle";	
-    },
-    
+        this.direction = -1;
+
+    }
     self.Ball.prototype = {
         move: function(){
 			this.x += (this.speed_x * this.direction);
 			this.y += (this.speed_y);
 		},
-        get width(){
-            return this.radius*2
-        },
-        get height(){
-            return this.radius*2
-        },  
     }
 
 })();
@@ -89,18 +84,21 @@
     }
     self.BoardView.prototype={
         draw : function(){
-                for (let i = this.board.elements.length - 1; i >=0; i--) {
-                    var el = this.board.elements[i];             
-                    draw(this.ctx,el)
-                }
-        }, 
+            
+            for (let i = this.board.elements.length - 1; i >=0; i--) {
+                var el = this.board.elements[i];             
+                draw(this.ctx,el)
+            }
+    },
         clean: function(){
             this.ctx.clearRect(0,0,board.width,board.height)
     },
     play: function(){
+        if(board.playing){
         this.clean()
         this.draw()
-    }
+        this.board.ball.move()}
+    },
     }
         //Dibuja en el board
         function draw(ctx,element){
@@ -125,26 +123,33 @@ var canvas = document.getElementById("canvas")
 var board_view = new BoardView(canvas, board)
 var ball = new Ball(350, 200 , 10,board);
 
+//Movimiento de las barras
 document.addEventListener("keydown",(ev)=>{
-    e.preventDefault()
     if(ev.keyCode == 38){
+		ev.preventDefault()
 		bar.up()
 	}
 	else if(ev.keyCode == 40){
+		ev.preventDefault()
 		bar.down()
-	}
-    else if(ev.keyCode === 87){
+	}else if(ev.keyCode === 87){
         //W
+		ev.preventDefault()
 		bar_2.up()
 	}else if(ev.keyCode === 83){
         //S
+		ev.preventDefault()
 		bar_2.down();
+	}else if(ev.keyCode === 32){
+        //detener el juego con espacio
+		ev.preventDefault()
+		board.playing = !board.playing
 	}
-
 })
 
 window.requestAnimationFrame(controller)
 
+board_view.draw()
 function controller(){
     board_view.play()
     window.requestAnimationFrame(controller)
