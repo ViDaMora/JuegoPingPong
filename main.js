@@ -130,6 +130,7 @@
             }
             
         };
+        //Estal ogica permite que la bola no salga del canvas 
         if(this.board.ball.y - this.board.ball.radius < 0 ||this.board.ball.y + this.board.ball.radius > 400 ){
             this.board.ball.speed_y= this.board.ball.speed_y*-1
         }
