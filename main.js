@@ -130,6 +130,13 @@
             }
             
         };
+        if(this.board.ball.y - this.board.ball.radius < 0 ||this.board.ball.y + this.board.ball.radius > 400 ){
+            this.board.ball.speed_y= this.board.ball.speed_y*-1
+        }
+        if(this.board.ball.x - this.board.ball.radius < 0 ||this.board.ball.x + this.board.ball.radius > 800 ){
+            this.board.ball.speed_x= this.board.ball.speed_x*-1
+        }
+
     },
     }
     //Este metodo arroja true si la bola golpea las barras, teniendo en cuentra los tamaños de estos
