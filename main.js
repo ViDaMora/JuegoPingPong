@@ -13,7 +13,7 @@
         //getter para obtener las barras y la bola 
 		get elements(){
 			var elements = this.bars;
-			elements.push(this.ball);
+		//	elements.push(this.ball);
 			return elements;
 		}
         
@@ -45,7 +45,39 @@
     }
 
 })()
+(function(){
+    self.Ball = function(x,y,radius,board){
+        this.x = x;
+		this.y = y;
+		this.radius = radius;
+		this.speed_y = 0;
+		this.speed_x = 3;
+		this.board = board;
+		this.direction = -1;
+		this.speed = 3;
+        this.bounce_angle = 0;
+		this.max_bounce_angle = Math.PI / 12;
 
+
+
+		board.ball = this;
+		this.kind = "circle";	
+    },
+    
+    self.Ball.prototype = {
+        move: function(){
+			this.x += (this.speed_x * this.direction);
+			this.y += (this.speed_y);
+		},
+        get width(){
+            return this.radius*2
+        },
+        get height(){
+            return this.radius*2
+        },  
+    }
+
+})();
 (function(){
     //Creacion de la clase BoardView, este es la instancia del canvas en el html
     self.BoardView = function(canvas,board){
@@ -62,36 +94,59 @@
                     draw(this.ctx,el)
                 }
         }, 
+        clean: function(){
+            this.ctx.clearRect(0,0,board.width,board.height)
+    },
+    play: function(){
+        this.clean()
+        this.draw()
     }
-    function draw(ctx,element){
+    }
         //Dibuja en el board
-        if (element != null & element.hasOwnProperty("kind")) {
+        function draw(ctx,element){
             switch(element.kind){
                 case "rectangle":
                     ctx.fillRect(element.x, element.y, element.width, element.height);
                     break;
+                case "circle": 
+                    ctx.beginPath();
+                    ctx.arc(element.x,element.y,element.radius,0,7);
+                    ctx.fill();
+                    ctx.closePath();
+                    break;
         }
-   
-    }
-    }
+        }
 })();
 
+var board = new Board(800,400)
+var bar = new Bar(20,150,40,100,board)
+var bar_2 = new Bar(735,150,40,100,board)
+var canvas = document.getElementById("canvas")
+var board_view = new BoardView(canvas, board)
+var ball = new Ball(350, 200 , 10,board);
+
 document.addEventListener("keydown",(ev)=>{
-    console.log(ev).keyCode;
+    e.preventDefault()
     if(ev.keyCode == 38){
 		bar.up()
 	}
 	else if(ev.keyCode == 40){
 		bar.down()
 	}
+    else if(ev.keyCode === 87){
+        //W
+		bar_2.up()
+	}else if(ev.keyCode === 83){
+        //S
+		bar_2.down();
+	}
+
 })
-self.addEventListener("load",main)
-function main(){
-    //Sirve instanciar inicialmente los objetos, es ejecutado por el addEventListener
-    var board = new Board(800,400)
-    var bar = new Bar(20,150,40,100,board)
-    var canvas = document.getElementById("canvas")
-    var board_view = new BoardView(canvas, board)
-    console.log(board)
-    board_view.draw()
+
+window.requestAnimationFrame(controller)
+
+function controller(){
+    board_view.play()
+    window.requestAnimationFrame(controller)
+
 }
