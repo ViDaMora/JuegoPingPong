@@ -21,7 +21,6 @@
 })();
 
 
-
 (function(){
     self.Bar = function(x,y,width,height,board){
         this.x = x;
@@ -29,14 +28,20 @@
         this.width = width;
         this.height = height;
         this.board = board;
+        this.speed= 10;
         this.board.bars.push(this)
         this.kind ="rectangle"
     }
     self.Bar.prototype ={
         down: function(){
+            this.y+=this.speed
         },
         up : function(){
+            this.y -=this.speed
         },
+        toString: function(){
+            return "x:" + this.x + " y:" + this.y
+        }
     }
 
 })()
@@ -59,6 +64,7 @@
         }, 
     }
     function draw(ctx,element){
+        //Dibuja en el board
         if (element != null & element.hasOwnProperty("kind")) {
             switch(element.kind){
                 case "rectangle":
@@ -70,14 +76,21 @@
     }
 })();
 
+document.addEventListener("keydown",(ev)=>{
+    console.log(ev).keyCode;
+    if(ev.keyCode == 38){
+		bar.up()
+	}
+	else if(ev.keyCode == 40){
+		bar.down()
+	}
+})
 self.addEventListener("load",main)
 function main(){
     //Sirve instanciar inicialmente los objetos, es ejecutado por el addEventListener
     var board = new Board(800,400)
     var bar = new Bar(20,150,40,100,board)
     var canvas = document.getElementById("canvas")
-    console.log(board)
-
     var board_view = new BoardView(canvas, board)
     console.log(board)
     board_view.draw()
